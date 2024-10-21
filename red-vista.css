@@ -1,0 +1,67 @@
+/* Estilos básicos */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: rgb(27, 27, 27); /* Puedes cambiar el fondo si prefieres otro color */
+}
+
+/* Pantalla de carga */
+#loading-screen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(27, 27, 27);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.5em;
+    z-index: 1000;
+    /* Colocar al frente */
+}
+#loading-gif {
+    max-width: 90%; /* Limitar el ancho máximo */
+    max-height: 90%; /* Limitar la altura máxima */
+    width: auto; /* Mantener la proporción */
+    height: auto; /* Mantener la proporción */
+}
+/* Estilo para el video */
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Para que el video se ajuste correctamente sin distorsionarse */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Asegura que el video esté detrás de otros elementos como el canvas */
+}
+
+/* Estilo para el canvas (superpuesto al video) */
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2; /* El canvas debe estar sobre el video */
+    
+    height: 100%;
+}
+
+.contenedorNoti{
+    z-index: 3; /* Colocar la notificación por encima del canvas y el video */
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilo para la notificación */
+#notification {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    display: none; /* Ocultar notificación por defecto */
+}
