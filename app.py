@@ -1,31 +1,19 @@
 # server/app.py
 
 from flask import Flask, request, jsonify
-import cv2
 import os
 import base64
-from object_detection import load_model, predict
+import numpy as np
+import cv2
+from ultralytics import YOLO
 
 app = Flask(__name__)
-model = load_model()
+
+# Cargar el modelo YOLOv8
+model = YOLO('detect.v1i.yolov8/test.pt')  # Ruta a tu modelo entrenado
 
 @app.route('/predict', methods=['POST'])
-def predict_route():
-    data = request.json
-    image_data = data['image'].split(',')[1]  # Eliminar la parte de Data URL
-    image = decode_image(image_data)
-    
-    detections = predict(image, model)  # Llama a tu función de predicción
-    return jsonify({'detecciones': detections})
-
-def decode_image(data):
-    # Decodificar la imagen desde base64
-    img_data = base64.b64decode(data)
-    nparr = np.frombuffer(img_data, np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    return image
-
-def predict_object():
+def predict():
     data = request.json['image']
     # Decodificar la imagen
     img_data = base64.b64decode(data.split(',')[1])
@@ -38,30 +26,26 @@ def predict_object():
     # Procesar la imagen usando OpenCV
     image = cv2.imread(img_path)
 
-    # Realizar la detección de objetos
-    detections = predict(image, model)  # Usa la función de predicción
+    # Realizar la detección de objetos con YOLOv8
+    results = model(image)
 
-    # Procesar las detecciones y preparar la respuesta
-    detecciones_formateadas = process_detections(detections)
+    # Extraer información de la detección
+    detecciones = []
+    for result in results:
+        for box in result.boxes:
+            x1, y1, x2, y2 = box.xyxy[0]  # Coordenadas de la caja delimitadora
+            confidence = box.conf[0]      # Confianza de la predicción
+            class_id = int(box.cls[0])    # ID de clase
+            detecciones.append({
+                'class_id': class_id,
+                'confidence': confidence.item(),
+                'box': [x1.item(), y1.item(), x2.item(), y2.item()]
+            })
 
     # Eliminar la imagen temporal si no es necesaria
     os.remove(img_path)
 
-    return jsonify({'detecciones': detecciones_formateadas})
-
-def process_detections(detections):
-    # Procesar las detecciones del modelo y devolver una lista de resultados
-    results = []
-    for detection in detections:
-        # Ajusta el procesamiento según la salida de tu modelo
-        results.append({
-            'class': detection['class'],  # Cambia esto según tu salida
-            'x': int(detection['x']),
-            'y': int(detection['y']),
-            'width': int(detection['width']),
-            'height': int(detection['height'])
-        })
-    return results
+    return jsonify({'detecciones': detecciones})
 
 if __name__ == '__main__':
     app.run(debug=True)

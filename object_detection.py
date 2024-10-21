@@ -1,5 +1,3 @@
-# model/object_detection.py
-
 import keras
 import keras_hub
 import cv2
@@ -21,4 +19,25 @@ def preprocess(image):
 def predict(image, model):
     preprocessed_image = preprocess(image)
     detections = model.predict(preprocessed_image)
-    return detections
+
+    # Procesar las detecciones
+    return process_detections(detections)
+
+def process_detections(detections):
+    results = []
+    # Asumiendo que detections es un tensor con la forma [batch_size, num_detections, 6]
+    # donde las columnas son [x_min, y_min, x_max, y_max, class_id, score]
+    for detection in detections[0]:  # Iterar sobre la primera (y única) imagen en el batch
+        x_min, y_min, x_max, y_max, class_id, score = detection
+
+        # Filtrar detecciones con baja puntuación
+        if score >= 0.5:  # Ajusta este umbral según sea necesario
+            results.append({
+                'class': int(class_id),
+                'x': int(x_min),
+                'y': int(y_min),
+                'width': int(x_max - x_min),
+                'height': int(y_max - y_min)
+            })
+
+    return results
