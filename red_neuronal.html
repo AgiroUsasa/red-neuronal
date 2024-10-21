@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="icon" href="clarolab.png" type="image/x-icon">
+    <link rel="stylesheet" href="red-vista.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Identificación de Objetos</title>
-    <style>
-        /* Estilos básicos */
-        video {
-            border: 1px solid black;
-            width: 100%;
-            height: auto;
-        }
-    </style>
 </head>
 <body>
-    <video id="video" autoplay playsinline></video>
-    <button id="capture">Capturar Imagen</button>
+    <!-- Pantalla de carga -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <img src="perfect-loop-cube.gif" alt="" id="loading-gif">
+    </div>
+    
+    <!-- video de la cámara -->
+    <video id="video" autoplay playsinline ontouchend="captureImage()"></video>
+
+    <!-- canvas para dibujar las detecciones -->
     <canvas id="canvas" style="display:none;"></canvas>
-    <script src="red.js"></script>
+
+    <div class="contenedorNoti"><div id="notification"></div></div>
+    
+    <script src="red-logica.js"></script>
 </body>
 </html>
