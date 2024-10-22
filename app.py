@@ -17,6 +17,8 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    if 'image' not in request.json:
+        return jsonify({'error': 'No image provided'}), 400
     data = request.json['image']
     # Decodificar la imagen
     img_data = base64.b64decode(data.split(',')[1])
@@ -50,6 +52,7 @@ def predict():
                 "IBM3348",
                 "MSX_DPC-200",
                 "PowerBook160"
+                "CuboMirro"
             ]
             class_name = class_names[class_id] if class_id < len(class_names) else "Unknown"
 

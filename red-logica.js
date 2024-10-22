@@ -1,3 +1,4 @@
+let currentCamera = 'environment'; // Cámara trasera por defecto
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -6,9 +7,43 @@ const loadingScreen = document.getElementById('loading-screen');
 const MIN_LOADING_TIME = 4000; // 4 segundos
 let rect = { x: 0, y: 0, width: 0, height: 0 }; // Inicializar las coordenadas del rectángulo
 
+// Acceder a la cámara inicial
+navigator.mediaDevices.getUserMedia({ video: { facingMode: currentCamera } })
+    .then(stream => {
+        video.srcObject = stream;
+        video.play();
+    })
+    .catch(err => {
+        console.error("Error al acceder a la cámara: ", err);
+    });
+
+// Cambiar cámara al tocar la pantalla
+document.body.addEventListener('touchend', () => {
+    // Alternar entre las cámaras
+    currentCamera = currentCamera === 'environment' ? 'user' : 'environment'; // Cambiar entre trasera y frontal
+    changeCamera();
+});
+
 // Función para mostrar pantalla de carga
 function showLoading() {
     loadingScreen.style.display = 'flex';
+}
+
+function changeCamera() {
+    // Detener el video actual
+    const stream = video.srcObject;
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+
+    // Acceder a la cámara con el modo actualizado
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: currentCamera } })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(err => {
+            console.error("Error al cambiar la cámara: ", err);
+        });
 }
 
 // Función para ocultar la pantalla de carga
@@ -67,8 +102,6 @@ function drawRect() {
 
 // Llama a la función captureImage cuando se toca cualquier parte del body
 document.body.addEventListener('touchend', captureImage);
-// Agregar el evento de clic para dispositivos no táctiless
-document.addEventListener( 'click',captureImage);
 
 // Agregar el evento de clic para dispositivos no táctiles
 video.addEventListener( 'click',captureImage);
@@ -114,7 +147,12 @@ function sendImageToServer(dataURL) {
         },
         body: JSON.stringify({ image: dataURL }),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+    })
     .then(data => {
         console.log('Detecciones del servidor:', data.detecciones);
         updateRectangle(data.detecciones); // Actualizar el rectángulo con las detecciones
@@ -126,18 +164,23 @@ function sendImageToServer(dataURL) {
 
 // Función para actualizar el rectángulo con las coordenadas del objeto detectado
 function updateRectangle(detecciones) {
-    if (detecciones.length > 0) {
-        // Suponiendo que las detecciones devuelven un array de objetos con las propiedades x, y, width, height
-        const { x, y, width, height } = detecciones[0]; // Tomar la primera detección
-        rect.x = x;
-        rect.y = y;
-        rect.width = width;
-        rect.height = height;
-    } else {
-        // Limpiar el rectángulo si no hay detecciones
-        rect.width = 0;
-        rect.height = 0;
-    }
+    context.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+
+    detecciones.forEach(deteccion => {
+        const [x1, y1, x2, y2] = deteccion.box;
+        const confidence = deteccion.confidence.toFixed(2);
+
+        // Dibujar la caja delimitadora
+        context.beginPath();
+        context.rect(x1, y1, x2 - x1, y2 - y1);
+        context.lineWidth = 2;
+        context.strokeStyle = 'red';
+        context.stroke();
+
+        // Mostrar la confianza
+        context.fillStyle = 'red';
+        context.fillText(`Conf: ${confidence}`, x1, y1 > 10 ? y1 - 5 : 10);
+    });
 }
 
 // Dibujar el rectángulo cada vez que se actualiza el video
