@@ -1,5 +1,5 @@
+tensorflow>=2.13
+keras>=3.3
 Flask==2.3.3
-tensorflow==2.13.0
-keras>=3.3.0
 keras-hub==0.16.1
 opencv-python==4.8.0.76
