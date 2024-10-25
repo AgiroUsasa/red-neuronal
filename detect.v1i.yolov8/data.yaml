@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 5
+names: ['Contex Calculators', 'dpc-200', 'ibm3348', 'ibm348', 'powerbook 160']
+
+roboflow:
+  workspace: maximiliano-z-acunia-gmail-com
+  project: detect-8nxls
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/maximiliano-z-acunia-gmail-com/detect-8nxls/dataset/1
