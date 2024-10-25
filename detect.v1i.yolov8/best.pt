@@ -1,8 +1,0 @@
-from ultralytics import YOLO
-
-# Cargar el modelo YOLOv8 preentrenado
-model = YOLO('yolov8n.pt')  # o la versión que desees
-
-# Entrenar el modelo
-model.train(data='dataset.yaml', epochs=50)  # Ajusta epochs y otros parámetros según sea necesario
-
