@@ -7,15 +7,13 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 
-app = Flask(__name__)
 
-# Cargar el modelo YOLOv8
-model = YOLO('detect.v1i.yolov8/test.pt')  # Ruta a tu modelo entrenado
-@app.route('/')
+app = Flask(__name__)
+model = YOLO('detect.v1i.yolov8/best.pt')  # Ruta correcta de tu modelo
 def index():
     return send_from_directory('red_neuronal.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/detect', methods=['POST'])
 def predict():
     if 'image' not in request.json:
         return jsonify({'error': 'No se proporcionó una imagen'}), 400
