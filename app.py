@@ -10,6 +10,8 @@ from ultralytics import YOLO
 
 app = Flask(__name__)
 model = YOLO('detect.v1i.yolov8/best.pt')  # Ruta correcta de tu modelo
+# Entrenar el modelo
+model.train(data='dataset.yaml', epochs=50)
 def index():
     return send_from_directory('red_neuronal.html')
 
