@@ -14,7 +14,7 @@ model = YOLO('detect.v1i.yolov8/test.pt')  # Ruta a tu modelo entrenado
 def index():
     return send_from_directory('', 'red_neuronal.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/detect', methods=['POST'])
 def predict():
     if 'image' not in request.json:
         return jsonify({'error': 'No se proporcionó una imagen'}), 400
