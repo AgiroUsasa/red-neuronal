@@ -34,7 +34,7 @@ function captureImage() {
 
 // Función para enviar la imagen al servidor
 function sendImageToServer(dataURL) {
-    fetch('http://localhost:5000/predict', { // Asegúrate de que la URL sea correcta
+    fetch('https://github.com/AgiroUsasa/red-neuronal/blob/main/app.py', { // Asegúrate de que la URL sea correcta
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
