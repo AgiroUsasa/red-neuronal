@@ -2,6 +2,7 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const notification = document.getElementById('notification');
+let captureInterval;
 
 // Acceder a la cámara
 navigator.mediaDevices.getUserMedia({ video: true })
@@ -9,12 +10,22 @@ navigator.mediaDevices.getUserMedia({ video: true })
         video.srcObject = stream;
         video.play();
         // Iniciar captura de imágenes cada segundo
-        setInterval(captureImage, 1000);
+        startCapture();
     })
     .catch(err => {
         console.error("Error al acceder a la cámara: ", err);
         showNotification("No se pudo acceder a la cámara.");
     });
+
+// Función para iniciar la captura de imágenes
+function startCapture() {
+    captureInterval = setInterval(captureImage, 1000);
+}
+
+// Función para detener la captura de imágenes
+function stopCapture() {
+    clearInterval(captureInterval);
+}
 
 // Función para capturar la imagen y enviarla al servidor
 function captureImage() {
@@ -34,7 +45,7 @@ function captureImage() {
 
 // Función para enviar la imagen al servidor
 function sendImageToServer(dataURL) {
-    fetch('https://github.com/AgiroUsasa/red-neuronal/blob/main/app.py', { // Asegúrate de que la URL sea correcta
+    fetch('https://www.clarolab.com/ar/ofi/red-neuronal/app.py', { // Asegúrate de que la URL sea correcta
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -55,6 +66,7 @@ function sendImageToServer(dataURL) {
     })
     .catch(error => {
         console.error('Error:', error);
+        showNotification("Error al enviar la imagen al servidor.");
     });
 }
 
@@ -62,4 +74,12 @@ function sendImageToServer(dataURL) {
 function showNotification(message) {
     notification.textContent = message;
     notification.style.display = 'block';
+
+    // Ocultar la notificación después de 3 segundos
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
 }
+
+// Ejemplo de función para detener la captura al hacer clic en un botón
+document.getElementById('stopButton').addEventListener('click', stopCapture);
